@@ -8,6 +8,7 @@ const userRouter = Router()
 const { z } = require("zod")
 const jwt = require("jsonwebtoken")
 const { JWT_USER_PASSWORD } = require("../config")
+const { userMiddleware } = require("../middleware/user")
 
 userRouter.post("/signup", async (req, res) => {
 
@@ -37,27 +38,35 @@ userRouter.post("/signup", async (req, res) => {
     // let errorThrown = false
     try {
 
-    const email = req.body.email
-    const password = req.body.password
-    const firstName = req.body.firstName
-    const lastName = req.body.lastName
-        
-    const hashedPassword = await bcrypt.hash(password,  5)
+    const { email, password, firstName, lastName } = req.body;
+
+    const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+    const hashedPassword = await bcrypt.hash(password,  10)
     console.log(hashedPassword)
-        await userModel.create({
-            email: email,
+    const newUser = await userModel.create({
+            email,
             password: hashedPassword,
-            firstName: firstName,
-            lastName: lastName
+            firstName,
+            lastName
         })
+
+        let token = jwt.sign({ email, id: newUser._id.toString() }, JWT_USER_PASSWORD, { expiresIn: "1h" })
+        res.status(201).json({
+            token,
+            // user: newUser,
+            msg: "You are signed up successfully"
+        });
+
     } catch (error) {
-        return res.json({ message : "User already exists"})
+        console.error("Error during signup:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 
-        return res.json({
-            msg : "You are signed up"
-        })
-    // }
+        
 })
 
 
@@ -85,50 +94,60 @@ userRouter.post("/signin", async (req, res) => {
             });
         }
 
-
     const { email, password }  = req.body
-
-    if (!email || !password) {
-        return res.status(400).json({ message: "Email and password is required" })
-    }
 
     try {
 
-    let user = await userModel.findOne({ email })
+    const user = await userModel.findOne({ email })
     if (!user) {
-        return res.status(400).json({ error: "Invalid credentials" });
+        return res.status(400).json({ error: "User not in the database" });
     }
-    // if (user && await bcrypt.compare(password, user.password)) {
-    //     let token = jwt.sign({ email, id: user._id.toString() }, JWT_USER_PASSWORD)
+ 
 
-    //     // TODO: Need to add Cookie based authentication
-
-    //     return res.status(200).json({ token, user })
-    // }
-    // else {
-    //     return res.status(400).json({ error: "Invaild credentials" })
-    // }
     const passwordMatch = await bcrypt.compare(password, user.password)
     
-    if (passwordMatch) {
-        let token = jwt.sign({
+    if (!passwordMatch) {
+        return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+        // TODO: Need to add Cookie based authentication
+ 
+        const token = jwt.sign({
             email,
             id : user._id.toString()
         }, JWT_USER_PASSWORD,
         { expiresIn: "1h" })
         
-        return res.status(200).json({ token, user });
-    }
+        return res.status(200).json({ message : "You are signed in", token });
+    
 
-} catch (error) {
-    console.error("Error during signin:", error);
-    return res.status(500).json({ message: "Internal server error" });
-}    
-})
+    } catch (error) {
+        console.error("Error during signin:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }    
+    })
 
 
 
-    userRouter.get("/purchases", (req, res) => {
+
+
+
+
+    userRouter.get("/purchases", userMiddleware, async (req, res) => {
+
+        const { email, passsword } = req.body
+
+        const user = await userModel.findOne({ email })
+
+        if (!user) {
+            res.status(400).json({ message : "User not found"})
+        }
+
+        const purchases = await userModel.find({ 
+            ._id = course
+        })
+
+
     return res.json({
         msg : "Signin successful"
     })
