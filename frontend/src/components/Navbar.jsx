@@ -39,22 +39,27 @@ export default function Navbar() {
 
   return (
     <>  
-      <nav>
-        <div className='container bg-red-500'>
+      <nav className='bg-black text-white py-3'>
+        <div className='container flex justify-around'>
           {/* Logo section */}
           <div>
             <img src={Logo} alt="" className='max-w-[120px]'/>
           </div>
           {/* Menu section */}
           <div>
-            <ul>
+            <ul className='flex items-center gap-5'>
             {MenuData.map((item) => {
               return (
                 <li key={item.id}>
-                  <a href={item.url}>{item.title} </a>
+                  <a 
+                  className='uppercase text-xs'
+                  href={item.url}>{item.title} </a>
                 </li>    
               )
             })}
+            <li>
+              <button className='border rounded-full py-1 px-4'>Login</button>
+            </li>
             </ul>
           </div>
         </div>
