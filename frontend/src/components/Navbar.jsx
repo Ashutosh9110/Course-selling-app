@@ -1,70 +1,70 @@
-import React from 'react'
-import Logo from "../assets/react.svg"
+import React from "react";
+import { IoMdMenu } from "react-icons/io";
+import { motion } from "framer-motion";
 
-
-const MenuData = [
-
+const NavbarMenu = [
   {
     id: 1,
     title: "Home",
-    url: "#"
+    path: "/",
   },
   {
     id: 2,
-    title: "Courses",
-    url: "#"
+    title: "Services",
+    link: "#",
   },
   {
     id: 3,
-    title: "Purchases",
-    url: "#"
+    title: "About Us",
+    link: "#",
   },
   {
     id: 4,
-    title: "Profile",
-    url: "#"
+    title: "Our Team",
+    link: "#",
   },
   {
     id: 5,
-    title: "Settings",
-    url: "#"
+    title: "Contact Us",
+    link: "#",
   },
-
-
-
-]
-
-
-export default function Navbar() {
-
+];
+const Navbar = () => {
   return (
-    <>  
-      <nav className='bg-black text-white py-3'>
-        <div className='container flex justify-around'>
-          {/* Logo section */}
-          <div>
-            <img src={Logo} alt="" className='max-w-[120px]'/>
-          </div>
-          {/* Menu section */}
-          <div>
-            <ul className='flex items-center gap-5'>
-            {MenuData.map((item) => {
-              return (
-                <li key={item.id}>
-                  <a 
-                  className='uppercase text-xs'
-                  href={item.url}>{item.title} </a>
-                </li>    
-              )
-            })}
-            <li>
-              <button className='border rounded-full py-1 px-4'>Login</button>
-            </li>
-            </ul>
-          </div>
+    <nav className="relative z-20">
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="container py-10 flex justify-between items-center"
+      >
+        {/* Logo section */}
+        <div>
+          <h1 className="font-bold text-2xl">The Coding Journey</h1>
         </div>
-      </nav>
-    </>
+        {/* Menu section */}
+        <div className="hidden lg:block">
+          <ul className="flex items-center gap-3">
+            {NavbarMenu.map((menu) => (
+              <li key={menu.id}>
+                <a
+                  href={menu.path}
+                  className="inline-block py-2 px-3 hover:text-secondary relative group"
+                >
+                  <div className="w-2 h-2 bg-secondary absolute mt-4 rounded-full left-1/2 -translate-x-1/2 top-1/2 bottom-0 group-hover:block hidden"></div>
+                  {menu.title}
+                </a>
+              </li>
+            ))}
+            <button className="primary-btn">Sign In</button>
+          </ul>
+        </div>
+        {/* Mobile Hamburger menu section */}
+        <div className="lg:hidden">
+          <IoMdMenu className="text-4xl" />
+        </div>
+      </motion.div>
+    </nav>
+  );
+};
 
-  )
-}
+export default Navbar;
