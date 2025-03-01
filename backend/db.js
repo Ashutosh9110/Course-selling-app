@@ -41,6 +41,8 @@ const purchaseSchema = new Schema({
     })
 
 
+//TODO: there should be another schema for the course content...that is video no: 1, 2, 3.
+
 
 const userModel = mongoose.model("user", userSchema)
 const adminModel = mongoose.model("admin", adminSchema)

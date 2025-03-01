@@ -3,7 +3,7 @@
 // const Router = express.Router()
 const bcrypt = require("bcrypt")
 const { Router } = require("express")
-const { userModel } = require("../db")
+const { userModel, purchaseModel, courseModel } = require("../db")
 const userRouter = Router()
 const { z } = require("zod")
 const jwt = require("jsonwebtoken")
@@ -130,34 +130,26 @@ userRouter.post("/signin", async (req, res) => {
 
 
 
+userRouter.get("/purchases", userMiddleware, async (req, res) => {
 
+        const userId = req.userId
 
-
-    userRouter.get("/purchases", userMiddleware, async (req, res) => {
-
-        const { email, passsword } = req.body
-
-        const user = await userModel.findOne({ email })
-
-        if (!user) {
-            res.status(400).json({ message : "User not found"})
-        }
-
-        const purchases = await userModel.find({ 
-            ._id = course
+        const purchases = await purchaseModel.find({
+            userId 
         })
 
+        const coursesData = await courseModel.find({
+            _id: { $in: purchases.map(x => x.courseId)}
+        })
 
-    return res.json({
-        msg : "Signin successful"
+    res.json({
+        // purchases,
+        coursesData
     })
 })
 
-
-
 module.exports = {
     userRouter
-
 }
 
 
